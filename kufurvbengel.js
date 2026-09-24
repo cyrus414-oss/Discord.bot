@@ -1,9 +1,6 @@
 const { PermissionFlagsBits } = require('discord.js');
 
-const kufurler = [
-    'aq', 'amina', 'amk', 'orospu', 'sik', 'piç', 'oc', 'oç', 'ananı',
-    'pic', 'anan', 'annen', 'yarram', 'döl', 'yarrak', 'mal', 'salak', 'amcık', 'göt'
-];
+const kufurler = ['aq', 'amina', 'amk', 'orospu', 'sik', 'piç', 'oc', 'oç', 'ananı'];
 const uyariVeritabani = new Map();
 
 module.exports = (client) => {
@@ -17,7 +14,7 @@ module.exports = (client) => {
         const discordInvite = content.includes('discord.gg/') || content.includes('discord.com/invite/');
         const hasLink = content.includes('http://') || content.includes('https://') || content.includes('www.');
 
-        if (kufurVarMi || discordInvite || hasLink) {
+        if (kufurVarMis = (kufurVarMi || discordInvite || hasLink)) {
             try {
                 await message.delete().catch(() => {});
 
@@ -28,15 +25,13 @@ module.exports = (client) => {
 
                 const ihlalTuru = kufurVarMi ? 'küfür etmek' : 'link/reklam paylaşmak';
 
-                const hedefRolAdi = `U${mevcutUyari}`;
-                const yeniRol = message.guild.roles.cache.find(r => r.name === hedefRolAdi);
-
-                // --- 10. UYARI (ZAMAN AŞIMI VE TEMİZLİK) ---
+                // --- 10. UYARI (ZAMAN AŞIMI VE ROL TEMİZLİĞİ) ---
                 if (mevcutUyari >= 10) {
                     try {
                         await message.member.timeout(24 * 60 * 60 * 1000, '10 kez küfür/reklam sınırına ulaştı.');
                         uyariVeritabani.set(userId, 0);
 
+                        // Tüm U rollerini kullanıcıdan geri al
                         for (let i = 1; i <= 10; i++) {
                             const eskiRol = message.guild.roles.cache.find(r => r.name === `U${i}`);
                             if (eskiRol && message.member.roles.cache.has(eskiRol.id)) {
@@ -52,17 +47,20 @@ module.exports = (client) => {
                     }
                 }
 
-                // --- ÖNCEKİ U ROLÜNÜ SİL, YENİSİNİ EKLE ---
+                // --- ROL YÖNETİMİ (Önceki U rolünü al, yenisini ver) ---
+                const hedefRolAdi = `U${mevcutUyari}`;
+                const yeniRol = message.guild.roles.cache.find(r => r.name === hedefRolAdi);
+
                 if (yeniRol) {
+                    // Kullanıcının üstündeki diğer U rollerini temizle
                     for (let i = 1; i <= 10; i++) {
                         const eskiRol = message.guild.roles.cache.find(r => r.name === `U${i}`);
                         if (eskiRol && message.member.roles.cache.has(eskiRol.id)) {
                             await message.member.roles.remove(eskiRol).catch(() => {});
                         }
                     }
+                    // Yeni U rolünü ekle
                     await message.member.roles.add(yeniRol).catch(err => console.error("Rol verilemedi:", err));
-                } else {
-                    console.log(`⚠️ Hata: "${hedefRolAdi}" adında bir rol sunucuda bulunamadı!`);
                 }
 
                 const uyari = await message.channel.send(`⚠️ <@${userId}>, bu sunucuda ${ihlalTuru} yasak! **Verilen Rol: U${mevcutUyari}/10**`);
