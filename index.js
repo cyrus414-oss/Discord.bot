@@ -1,3 +1,15 @@
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+    res.send('CraftingNW Bot Aktif! 🚀');
+});
+
+app.listen(port, () => {
+    console.log(`Web sunucusu ${port} portunda çalışıyor.`);
+});
+
 const { Client, GatewayIntentBits } = require('discord.js');
 
 const client = new Client({
